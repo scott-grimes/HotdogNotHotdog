@@ -1,0 +1,20 @@
+.Carousel {
+  max-width: 600px;
+  display:inline-block;
+
+}
+
+@media (max-width: 400px) {
+  .Carousel {
+    max-width: 100%;
+    display:inline-block;
+
+  }
+}
+
+img{
+  max-width:100%;
+  height: auto;
+
+
+}
