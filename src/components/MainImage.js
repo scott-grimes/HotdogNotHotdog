@@ -9,8 +9,8 @@ class MainImage extends Component {
 
   render() {
     const style = {
-      width: '600px',
-      height: '600px',
+      width: '100%',
+      height: '300px',
       backgroundImage: `url(${this.props.mainImage})`,
       'backgroundRepeat': 'no-repeat',
       'backgroundSize': 'contain',
@@ -19,9 +19,9 @@ class MainImage extends Component {
     
     return (
       <div className="MainImage">
-        <div style={style}>
-          <input className="inputfile" type="file" accept="image/*" capture="camera" />
-          <label className="inputfile" htmlFor="file">
+        <div style={style} className="MainImageInner">
+          <input id="file" className="inputfile" type="file" accept="image/*" capture="camera" />
+          <label htmlFor="file">
           Upload
           </label>
         </div>
