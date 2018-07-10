@@ -1,6 +1,7 @@
 // load different types of tensorflow models
 const tf = require('@tensorflow/tfjs');
-//require('@tensorflow/tfjs-node')
+require("@tensorflow/tfjs-node")
+tf.setBackend("tensorflow");
 const fs = require('fs');
 const http = require('http');
 
@@ -29,7 +30,7 @@ class Brain {
   }
 
   async loadTensor(modelName) {
-    return;
+  
     let startTime;
     if (DEBUG) {
       console.log('Loading Model...')
@@ -38,13 +39,17 @@ class Brain {
     }
     
     
-    const imageClassesJson = JSON.parse(fs.readFileSync( __dirname+ modelList[modelName].modelPath, 'utf8'));
+    const imageClassesJson = JSON.parse(
+      fs.readFileSync(
+         __dirname+ modelList[modelName].modelPath
+        , 'utf8'
+      ));
     
     this.imageClasses = imageClassesJson
     if(this.imageClasses){
       console.log('json loaded...')
     }
-    const modelPath = 'http://'+modelList[modelName].modelPath;
+    const modelPath = 'file://'+__dirname+modelList[modelName].modelPath;
     console.log( modelPath)
     this.model = await tf.loadModel(modelPath);
 
@@ -59,7 +64,7 @@ class Brain {
       console.log('Model Shapes for In/Out')
       console.log(this.model.inputs[0].shape);
       console.log(this.model.outputs[0].shape);
-      console.log(this.model);
+      //console.log(this.model);
     }
 
 

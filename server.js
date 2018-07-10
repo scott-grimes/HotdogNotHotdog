@@ -55,7 +55,7 @@ app.listen(port, () => {
 
 // get random urls for images (always returns one hotdog in the list)
 app.get('/random', (req, res) => {
-
+  console.log('hello from random!')
   var randomImagesSorted = shuffle( randomImages );
   var randomHotdogsSorted = shuffle( randomHotdogImages );
   var list = randomImagesSorted.slice(0, 3);
@@ -70,9 +70,15 @@ app.get('/guess', (req, res) => {
     res.status(400).send('Invalid GET request. Please send a URI encoded image!');
   }
   console.log(req.body);
-  brain.predictFromBase64(req.body).then(prediction=>console.log(prediction));
- 
-  res.status(200).send('recieved' + req.body);
+  brain.predictFromBase64(req.body).then(
+    prediction=>{
+      console.log(prediction)
+      res.status(200).send(prediction);
+    }
+  ).catch(err=>{
+    res.status(400).send(err);
+  });
+  
 });
 
 

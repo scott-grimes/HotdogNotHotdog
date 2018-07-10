@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import MainImage from './components/MainImage';
 import Results from './components/Results';
 import Carousel from './components/Carousel';
-import logo from './logo.svg';
-import './App.css';
+import convertToBase64 from "./scripts/api";
+import sendBase64ToServer from "./scripts/api";
+import "./App.css";
+//import logo from './logo.svg';
 
 class App extends Component {
 
@@ -14,6 +16,31 @@ class App extends Component {
     this.fetchRandomImages = this.fetchRandomImages.bind(this);
     this.selectImage = this.selectImage.bind(this);
     this.fetchRandomImages();
+  }
+
+  async predict(image) {
+
+    const hd64 = await convertToBase64(image);
+    const time = Date.now();
+    console.log('Predicting...')
+    const predictions = await sendBase64ToServer(hd64);
+    const duration = Date.now() - time;
+    console.log(predictions)
+    console.log(`Prediction completed in ${Math.floor(duration)}ms`);
+    /*
+    let hotdogToken = 'Not Hotdog'
+    hotdogToken = predictions[0].className.includes('hotdog') ? 'Maybe Hotdog' : hotdogToken;
+    hotdogToken = predictions[0].probability > 0.9 ? 'Is Hotdog' : hotdogToken;
+    let solution = 'Verdict: ';
+    solution += hotdogToken;
+    solution += '\n\nMachine Thinks this is...\n';
+    for (let predict of predictions) {
+      solution += predict.className + ' : ' + Math.floor(Math.round(predict.probability * 100)) + '%\n'
+    }
+    console.log(solution)
+    return solution*/
+
+    
   }
 
   
@@ -28,7 +55,7 @@ class App extends Component {
         this.setState({ randomImages: list });
       })
       .catch(err=>console.log(err));
-    console.log(this.state);
+    
   }
 
 
