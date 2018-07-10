@@ -29,6 +29,7 @@ class Brain {
   }
 
   async loadTensor(modelName) {
+    return;
     let startTime;
     if (DEBUG) {
       console.log('Loading Model...')

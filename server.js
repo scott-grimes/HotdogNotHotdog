@@ -3,6 +3,7 @@ const fs = require('fs');
 const Brain = require('./tfLoader').Brain;
 const app = express();
 let brain;
+const port = process.env.port || 5000;
 
 let randomImages;
 let randomHotdogImages;
@@ -11,26 +12,33 @@ const shuffle = x => x.slice().sort( ()=> 0.5 - Math.random());
 
 // inits our random images
 fs.readdir(
-  __dirname + 'client/public/images/randomImages', 
+  __dirname + '/client/public/images/randomImages', 
   (err, files) => {
+    console.log(err, files);
     if (err) {
       console.log(err);
+    } else {
+
+      randomImages = files.map(x => '/images/randomImages/' + x);
     }
-    randomImages = files.map(x=>'/images/randomImages/' + x);
+   
   });
 
 fs.readdir(
-  __dirname + 'client/public/images/hotdogImages',
+  __dirname + '/client/public/images/hotdogImages',
   (err, files) => {
+    console.log(err, files);
     if (err) {
       console.log(err);
+    } else {
+      randomHotdogImages = files.map(x => '/images/hotdogImages/' + x);
     }
-    randomHotdogImages = files.map(x => '/images/hotdogImages/' + x);
+    
   }
 );
 
 
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log('Hotdog Server running on port 3000...');
 
   brain = new Brain();

@@ -10,11 +10,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-      mainImage: '/images/hotdogs/hotdog.png', 
-      randomImages: [],
-      allowSelection: true,
-      overlay: 'none' // can be 'none', 'ishotdog', 'notishotdog'
-    };
+      mainImage: '/images/hotdogImages/hotdog.png', randomImages: [], allowSelection: true, overlay: 'none' }; // can be 'none', 'ishotdog', 'notishotdog'
     this.fetchRandomImages = this.fetchRandomImages.bind(this);
     this.selectImage = this.selectImage.bind(this);
     this.fetchRandomImages();
@@ -24,7 +20,7 @@ class App extends Component {
 
   fetchRandomImages() {
 
-    fetch('/random')
+    return fetch('/random')
       .then(function (response) {
         return response.json();
       })
@@ -32,7 +28,7 @@ class App extends Component {
         this.setState({ randomImages: list });
       })
       .catch(err=>console.log(err));
-
+    console.log(this.state);
   }
 
 
