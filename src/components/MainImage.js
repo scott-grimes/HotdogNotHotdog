@@ -6,7 +6,7 @@ class MainImage extends Component {
   constructor(props) {
     super(props);
   }
-
+  
   render() {
     const style = {
       width: '100%',

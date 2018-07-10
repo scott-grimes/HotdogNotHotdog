@@ -1,7 +1,11 @@
+
 .Carousel {
+ display:inline-block;
+}
+
+.CarouselInner{ 
   max-width: 600px;
-  display:inline-block;
-text-align: center;clear:both;
+  text-align: center;
 }
 
 @media (max-width: 400px) {
@@ -13,8 +17,7 @@ text-align: center;clear:both;
 }
 
 img{
-  max-width:100%;
-  height: auto;
-
-
+  max-height:150px;
+  max-width:150px;
+   display: inline-block;
 }
