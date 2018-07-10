@@ -38,7 +38,8 @@ const sendBase64ToServer = async function (base64) {
       data = JSON.stringify({ image: base64 });
 
     httpPost.onreadystatechange = function (err) {
-      if (httpPost.readyState == 4 && httpPost.status == 200) {
+      if (httpPost.readyState === 4 && httpPost.status === 200) {
+        console.log(httpPost.reponseText)
         resolve(httpPost.responseText);
       } else {
         reject(err);
@@ -59,4 +60,4 @@ const getTypeFromImageUrl = async function getTypeFromImageUrl(imageUrl) {
   return response.blob().type;
 }
 
-module.exports = {convertToBase64, sendBase64ToServer}
+export {convertToBase64, sendBase64ToServer}

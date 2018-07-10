@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import MainImage from './components/MainImage';
 import Results from './components/Results';
 import Carousel from './components/Carousel';
-import convertToBase64 from "./scripts/api";
-import sendBase64ToServer from "./scripts/api";
+import { convertToBase64, sendBase64ToServer } from './scripts/api';
 import "./App.css";
 //import logo from './logo.svg';
 
@@ -15,11 +14,12 @@ class App extends Component {
       mainImage: '/images/hotdogImages/hotdog.png', randomImages: [], allowSelection: true, overlay: 'none' }; // can be 'none', 'ishotdog', 'notishotdog'
     this.fetchRandomImages = this.fetchRandomImages.bind(this);
     this.selectImage = this.selectImage.bind(this);
+    this.predict = this.predict.bind(this);
     this.fetchRandomImages();
   }
 
   async predict(image) {
-
+    console.log(convertToBase64)
     const hd64 = await convertToBase64(image);
     const time = Date.now();
     console.log('Predicting...')
@@ -63,7 +63,7 @@ class App extends Component {
     if (!this.state.allowSelection) {
       return;
     }
-    console.log(img);
+    //console.log(img);
     this.setState({allowSelection: false, mainImage: img.src});
     // set state to locked
 
@@ -71,10 +71,11 @@ class App extends Component {
     setTimeout(()=>this.setState({allowSelection: true}), 1000);
     // fetch thing
     // on promise resolve, trigger rerender
+    this.predict(img);
   }
 
   render() {
-    console.log(this.state);
+    //console.log(this.state);
     return <div className="App">
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />

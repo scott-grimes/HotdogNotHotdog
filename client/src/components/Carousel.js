@@ -4,7 +4,7 @@ import './Carousel.css';
 class Carousel extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
+    //console.log(props);
     this.handleSelect = this.handleSelect.bind(this);
   }
 
@@ -14,20 +14,20 @@ class Carousel extends Component {
   }
 
   render() {
-    console.log(this.props.randomImages, 'rendering caroslul');
+    // console.log(this.props.randomImages, 'rendering caroslul');
     if (this.props.randomImages) {
-      console.log('images yes');
+      //console.log('images yes');
       return <div className="Carousel">
         <div className="CarouselInner">
           <div className="ImageList">
             {this.props.randomImages.map((url, index) => {
-              return <img key={index} src={url} onClick={this.handleSelect}></img>;
+              return <img alt={url} key={index} src={url} onClick={this.handleSelect}></img>;
             })}</div>
-          <p><a href="#" onClick={this.props.fetchRandomImages}>Random</a></p></div>
+          <p><button onClick={this.props.fetchRandomImages}>Random</button></p></div>
       </div>;
     }
 
-    return (<div><p><a href="#" onClick={this.props.fetchRandomImages}>Random</a></p></div>);
+    return (<div><p><button onClick={this.props.fetchRandomImages}>Random</button></p></div>);
   }
 }
 
