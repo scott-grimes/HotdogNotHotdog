@@ -1,23 +1,20 @@
 {
-  "name": "hotdognothotdog2",
-  "version": "0.1.0",
-  "private": true,
+  "name": "HotdogNotHotdog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "client": "cd client && yarn start",
+    "server": "nodemon server.js",
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+  },
   "dependencies": {
     "@tensorflow/tfjs": "^0.12.0",
-    "cors": "^2.8.4",
+    "@tensorflow/tfjs-node": "^0.1.7",
     "express": "^4.16.3",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "server": "nodemon --watch server ./server/server.js "
+    "nodemon": "^1.17.5"
   },
   "devDependencies": {
-    "nodemon": "^1.17.5"
+    "concurrently": "^3.6.0"
   }
 }
