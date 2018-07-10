@@ -1,6 +1,9 @@
 // load different types of tensorflow models
 const tf = require('@tensorflow/tfjs');
 require("@tensorflow/tfjs-node")
+var jsdom = require("jsdom");
+var { JSDOM } = jsdom;
+
 tf.setBackend("tensorflow");
 const fs = require('fs');
 const http = require('http');
@@ -27,6 +30,7 @@ class Brain {
     this.imageClasses;
     this.imageSize;
     this.inputShapes;
+    this.predictFromImage = this.predictFromImage.bind(this);
   }
 
   async loadTensor(modelName) {
@@ -64,7 +68,7 @@ class Brain {
       console.log('Model Shapes for In/Out')
       console.log(this.model.inputs[0].shape);
       console.log(this.model.outputs[0].shape);
-      //console.log(this.model);
+      
     }
 
 
@@ -72,15 +76,16 @@ class Brain {
 
 
   async predictFromImage(image) {
-
+    console.log('predicting');
     //image must be sized correctly
     const startTime = Date.now();
 
     // tidy runs the function, then deallocates memory since tf is a hog
     const logits = tf.tidy(() => {
       // build tensor from our image
+      console.log('in the tidy')
       const img = tf.fromPixels(image).toFloat();
-
+      console.log('from pixels fired')
 
       // change rbg values from [0, 255] to [-1, 1] for inputting into our model
       const offset = tf.scalar(127.5);
@@ -146,11 +151,19 @@ class Brain {
   predictFromBase64(base64) {
     const self = this;
     return new Promise(function (resolve, reject) {
-      var image = document.createElement('img');
+      const dom = new JSDOM('');
+      console.log('jsdom',JSDOM)
+      //console.log('dom',dom)
+      //console.log('window', dom.window)
+      //console.log('document', dom.window.document)
+      var image = dom.window.document.createElement('img');
+      console.log('image',image)
       image.onload = function () {
+        console.log('image loaded')
         resolve(self.predictFromImage(image));
       }
       image.src = base64;
+      resolve(self.predictFromImage(image));
 
     });
   }

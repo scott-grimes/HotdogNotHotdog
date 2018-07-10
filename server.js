@@ -1,7 +1,13 @@
 const express = require('express');
 const fs = require('fs');
 const Brain = require('./tfLoader').Brain;
+
+const bodyParser = require("body-parser");
+
 const app = express();
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser())
+
 let brain;
 const port = process.env.port || 5000;
 
@@ -55,7 +61,6 @@ app.listen(port, () => {
 
 // get random urls for images (always returns one hotdog in the list)
 app.get('/random', (req, res) => {
-  console.log('hello from random!')
   var randomImagesSorted = shuffle( randomImages );
   var randomHotdogsSorted = shuffle( randomHotdogImages );
   var list = randomImagesSorted.slice(0, 3);
@@ -65,17 +70,18 @@ app.get('/random', (req, res) => {
 
 });
 
-app.get('/guess', (req, res) => {
+app.post('/guess', (req, res) => {
   if (!req.body) {
     res.status(400).send('Invalid GET request. Please send a URI encoded image!');
   }
-  console.log(req.body);
-  brain.predictFromBase64(req.body).then(
+  console.log('prediction request recieved')
+  brain.predictFromBase64(req.body.image).then(
     prediction=>{
       console.log(prediction)
       res.status(200).send(prediction);
     }
   ).catch(err=>{
+    console.log(err)
     res.status(400).send(err);
   });
   

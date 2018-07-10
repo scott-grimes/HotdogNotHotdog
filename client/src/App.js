@@ -19,8 +19,7 @@ class App extends Component {
   }
 
   async predict(image) {
-    console.log(convertToBase64)
-    const hd64 = await convertToBase64(image);
+    const hd64 = await convertToBase64(image.src);
     const time = Date.now();
     console.log('Predicting...')
     const predictions = await sendBase64ToServer(hd64);
