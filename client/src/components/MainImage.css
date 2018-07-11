@@ -4,7 +4,7 @@
   height:300px;
   display:inline-block;
   padding: 40px;
-  border-style: solid;
+  /* border-style: solid; */
   text-align: center;
 }
 
@@ -32,20 +32,26 @@
 	z-index: -1;
 }
 
-.inputfile + label {
-    font-size: 1.25em;
-    font-weight: 700;
+.uploadButton {
+
+    border: none;
     color: white;
-    background-color: black;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+
     display: inline-block;
     position: relative;
     float: right;
     vertical-align: bottom;
+    background-color: white;
+    color: black;
+    border: 2px solid #e7e7e7;
 }
-.inputfile + label {
-	cursor: pointer; /* "hand" cursor */
-}
-.inputfile:focus + label,
-.inputfile + label:hover {
-    background-color: red;
-}
+
+.uploadButton:hover {background-color: #e7e7e7;}

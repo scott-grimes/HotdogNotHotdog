@@ -18,7 +18,8 @@ class App extends Component {
       randomImages: [], 
       allowSelection: true, 
       overlay: 'none',
-      predictions:[]
+      predictions:[],
+      lastRandomFetch: 0
      }; // can be 'none', 'ishotdog', 'notishotdog'
     this.fetchRandomImages = this.fetchRandomImages.bind(this);
     this.selectImage = this.selectImage.bind(this);
@@ -76,7 +77,9 @@ class App extends Component {
   }
 
   fetchRandomImages() {
-    
+    const now = Date.now();
+    if(now<this.state.lastRandomFetch+2000) return;
+    this.setState({lastRandomFetch: now})
     return fetch('/random')
       .then(function (response) {
         return response.json();
@@ -107,7 +110,8 @@ class App extends Component {
       </header> */}
         <MainImage selectImage={this.selectImage} mainImage={this.state.mainImage} />
         <Results predictions={this.state.predictions} />
-        <Carousel selectImage={this.selectImage} fetchRandomImages={this.fetchRandomImages} randomImages={this.state.randomImages} />
+      <hr></hr>
+      <Carousel selectImage={this.selectImage} fetchRandomImages={this.fetchRandomImages} randomImages={this.state.randomImages} />
       </div>;
   }
 }

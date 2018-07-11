@@ -4,7 +4,7 @@
 }
 
 .CarouselInner{ 
-  max-width: 600px;
+  max-width: 800px;
   text-align: center;
 }
 
@@ -20,4 +20,5 @@ img{
   max-height:150px;
   max-width:150px;
    display: inline-block;
+   margin: 3px;
 }

@@ -20,12 +20,13 @@ class Results extends Component {
     }
 
     const verdictStyle = {
-
+      'color': color,
+      'fontWeight': 'bold'
     };
 
     return (<div>
       <div className="Results">
-        <div style={verdictStyle}>ANSWER</div>
+        <div style={verdictStyle}>{verdict}</div>
         {this.props.predictions.map((x, idx) => < div key={idx}>{x.className.toUpperCase()} {Math.floor(x.probability * 100) + '%'}</div>)}
       </div></div>);
   }

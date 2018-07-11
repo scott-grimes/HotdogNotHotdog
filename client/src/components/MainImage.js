@@ -37,16 +37,14 @@ class MainImage extends Component {
       'backgroundPosition': 'center'
     };
     
-    return (
-      <div className="MainImage">
-        <div style={style} className="MainImageInner">
-          <input onChange={this.uploadHandler} id="file" className="inputfile" type="file" accept="image/*" capture="camera" />
-          <label htmlFor="file">
-            Upload Photo
-          </label>
-        </div>
+    return <div className="MainImage">
+      <div style={style} className="MainImageInner">
+        <input onChange={this.uploadHandler} id="file" className="inputfile" type="file" accept="image/*" capture="camera" />
+        <label class="uploadButton" htmlFor="file">
+            Upload &#128228;
+        </label>
       </div>
-    );
+    </div>;
   }
 }
 

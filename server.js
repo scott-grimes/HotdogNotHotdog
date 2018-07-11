@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 let brain;
 const port = process.env.port || 5000;
+const RANDOMIMAGECOUNT = 5;
 
 let randomImages;
 let randomHotdogImages;
@@ -64,7 +65,7 @@ app.listen(port, () => {
 app.get('/random', (req, res) => {
   var randomImagesSorted = shuffle( randomImages );
   var randomHotdogsSorted = shuffle( randomHotdogImages );
-  var list = randomImagesSorted.slice(0, 3);
+  var list = randomImagesSorted.slice(0, RANDOMIMAGECOUNT-1);
   list = list.concat( randomHotdogsSorted[0]);
   list = shuffle(list);
   res.status(200).send(JSON.stringify(list));
