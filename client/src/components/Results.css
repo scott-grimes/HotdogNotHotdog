@@ -1,11 +1,15 @@
 .Results {
  display:inline-block;
- height: 200px;
+ height: 100px;
+ margin: 30px auto 30px;
+ text-align: center;
 }
 
 .ResultsInner{
  max-width: 600px;
 }
+
+
 
 @media (max-width: 400px) {
   .Results {

@@ -14,20 +14,53 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-      mainImage: '/images/hotdogImages/hotdog.png', randomImages: [], allowSelection: true, overlay: 'none' }; // can be 'none', 'ishotdog', 'notishotdog'
+      mainImage: '/images/hotdogImages/hotdog.png', 
+      randomImages: [], 
+      allowSelection: true, 
+      overlay: 'none',
+      predictions:[]
+     }; // can be 'none', 'ishotdog', 'notishotdog'
     this.fetchRandomImages = this.fetchRandomImages.bind(this);
     this.selectImage = this.selectImage.bind(this);
     this.predict = this.predict.bind(this);
     this.fetchRandomImages();
+    this.predict(this.state.mainImage)
   }
 
   //given an img element, predict what the image is
-  async predict(image) {
-    const pixelBlob = await imageToPixelBlob(image);
-    const response = await getPredictionFromServer(pixelBlob);
-    let predictions = null;
-    await response.json().then(res=>predictions=res)
-    console.log(predictions)
+  async predict(imgsrc) {
+    const self = this;
+    this.setState({predictions: []})
+    const img = document.createElement("IMG");
+    var found = false;
+    img.onload = async function(){
+      try{
+        const pixelBlob = await imageToPixelBlob(this);
+        console.log(pixelBlob)
+        setTimeout(() => {
+          if(!found){
+            throw('Server Timeout')
+          }
+        }, 5000);
+        const response = await getPredictionFromServer(pixelBlob);
+        let predictions = null;
+        
+        if(response.status===200){
+          found = true
+          await response.json().then(res => predictions = res)
+          console.log(predictions)
+          self.setState({ predictions: predictions });
+        }
+        
+      }catch(err){
+        console.log(err)
+        alert(err);
+      }
+      
+    }
+    img.src = imgsrc;
+
+    
     /*
     let hotdogToken = 'Not Hotdog'
     hotdogToken = predictions[0].className.includes('hotdog') ? 'Maybe Hotdog' : hotdogToken;
@@ -43,7 +76,7 @@ class App extends Component {
   }
 
   fetchRandomImages() {
-
+    
     return fetch('/random')
       .then(function (response) {
         return response.json();
@@ -56,27 +89,26 @@ class App extends Component {
   }
 
 
-  selectImage(img) {
+  selectImage(imgsrc) {
     if (!this.state.allowSelection) {
       return;
     }
-    this.setState({allowSelection: false, mainImage: img.src});
-   
+    this.setState({allowSelection: false, mainImage: imgsrc});
+    this.predict(imgsrc);
     setTimeout(()=>this.setState({allowSelection: true}), 1000);
     
-    this.predict(img);
   }
 
   render() {
     return <div className="App">
-      {/* <header className="App-header">
+        {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <h1 className="App-title">Welcome to React</h1>
       </header> */}
-      <MainImage mainImage={this.state.mainImage} />
-      <Results />
-      <Carousel selectImage={this.selectImage} fetchRandomImages={this.fetchRandomImages} randomImages={this.state.randomImages} />
-    </div>;
+        <MainImage selectImage={this.selectImage} mainImage={this.state.mainImage} />
+        <Results predictions={this.state.predictions} />
+        <Carousel selectImage={this.selectImage} fetchRandomImages={this.fetchRandomImages} randomImages={this.state.randomImages} />
+      </div>;
   }
 }
 

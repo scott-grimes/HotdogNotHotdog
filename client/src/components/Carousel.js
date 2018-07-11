@@ -10,7 +10,7 @@ class Carousel extends Component {
 
   handleSelect(e) {
     e.preventDefault();
-    this.props.selectImage(e.target);
+    this.props.selectImage(e.target.src);
   }
 
   render() {

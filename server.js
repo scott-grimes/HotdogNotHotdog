@@ -5,8 +5,8 @@ const Brain = require('./tfLoader').Brain;
 const bodyParser = require("body-parser");
 
 const app = express();
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser())
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 let brain;
 const port = process.env.port || 5000;

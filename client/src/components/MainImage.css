@@ -1,10 +1,11 @@
 .MainImage {
   width:100%;
   max-width:800px;
+  height:300px;
   display:inline-block;
-  padding: 0px;
-border-style: solid;
-text-align: center;
+  padding: 40px;
+  border-style: solid;
+  text-align: center;
 }
 
 @media (max-width: 400px) {
@@ -18,6 +19,7 @@ text-align: center;
 .MainImageInner{
   max-width: 100%;
   min-width: 400px;
+  margin: 0 auto;
   display:inline-block;
 }
 
