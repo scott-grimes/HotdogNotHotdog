@@ -2,7 +2,12 @@ import React, { Component } from 'react';
 import MainImage from './components/MainImage';
 import Results from './components/Results';
 import Carousel from './components/Carousel';
-import { convertToBase64, sendBase64ToServer } from './scripts/api';
+import {
+  convertToBase64,
+  sendBase64ToServer,
+  sendingPixelBlobToServer,
+  imageToPixelBlob
+} from "./scripts/api";
 import "./App.css";
 //import logo from './logo.svg';
 
@@ -19,10 +24,15 @@ class App extends Component {
   }
 
   async predict(image) {
-    const hd64 = await convertToBase64(image.src);
+    //const hd64 = await convertToBase64(image.src);
     const time = Date.now();
     console.log('Predicting...')
-    const predictions = await sendBase64ToServer(hd64);
+    const pixelBlob = await imageToPixelBlob(image);
+    console.log('in predict app',pixelBlob)
+    const response = await sendingPixelBlobToServer(pixelBlob);
+    let predictions = null;
+    await response.json().then(res=>predictions=res)
+    //const predictions = await sendBase64ToServer(hd64);
     const duration = Date.now() - time;
     console.log(predictions)
     console.log(`Prediction completed in ${Math.floor(duration)}ms`);

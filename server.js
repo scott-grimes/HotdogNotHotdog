@@ -70,15 +70,37 @@ app.get('/random', (req, res) => {
 
 });
 
+
+var predictbase64 = (b64img) => {
+  return brain.predictFromBase64(b64img);
+}
+
+var predictPixelBlob = (pixelBlob) => {
+  return brain.predictFromPixelBlob(pixelBlob);
+}
+
 app.post('/guess', (req, res) => {
+  let pchain = null;
   if (!req.body) {
-    res.status(400).send('Invalid GET request. Please send a URI encoded image!');
+    pchain = null; //do nothing
+  }else if(req.body.image){
+    pchain = predictbase64(req.body.image);
+  } else if (req.body.pixelBlob) {
+    console.log(typeof req.body.pixelBlob.array)
+    console.log(typeof req.body.pixelBlob.shape);
+    pchain = predictPixelBlob(req.body.pixelBlob);
   }
-  console.log('prediction request recieved')
-  brain.predictFromBase64(req.body.image).then(
+  
+
+  if (!pchain){
+    res.status(400).send('Invalid POST request. must be image or tensor');
+    return;
+  }
+
+  pchain.then().then(
     prediction=>{
-      console.log(prediction)
-      res.status(200).send(prediction);
+      console.log('prediction on server',prediction)
+      res.status(200).send(JSON.stringify(prediction));
     }
   ).catch(err=>{
     console.log(err)

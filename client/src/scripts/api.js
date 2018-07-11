@@ -1,4 +1,4 @@
-
+const tf = require("@tensorflow/tfjs");
 // converts an image located at url into it's base64 encoded representation. can be a local file or other file as long as the origin allows CORS
 const convertToBase64 = function (url) {
  
@@ -34,7 +34,7 @@ const convertToBase64 = function (url) {
 
 // sends our URI encoded image to the server for predicting
 const sendBase64ToServer = async function (base64) {
-  console.log('sending fetch')
+  let result = null;
   const res = await fetch('/guess', {
     method: "POST",
     headers: {
@@ -43,9 +43,22 @@ const sendBase64ToServer = async function (base64) {
     },
     body: JSON.stringify({ image: base64 })
   });
-  console.log(res)
-  return res;
+  res.then((data) => result = data);
+  return result;
 
+};
+
+// sends our URI encoded image to the server for predicting
+const sendingPixelBlobToServer = function(pixelBlob) {
+  return fetch("/guess", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ pixelBlob: pixelBlob })
+  });
+  
 };
 
 const getTypeFromImageUrl = async function getTypeFromImageUrl(imageUrl) {
@@ -53,4 +66,34 @@ const getTypeFromImageUrl = async function getTypeFromImageUrl(imageUrl) {
   return response.blob().type;
 }
 
-export {convertToBase64, sendBase64ToServer}
+// returns an object with the shape of the picture and an array of pixels
+// {shape: [150,200,3] array:[255,203...]}
+const imageToPixelBlob = async function(image){
+  var tensor = tf.fromPixels(image)
+  console.log(tensor);
+  var obj = {shape:tensor.shape};
+  await tensor
+    .data()
+    .then(res => obj['array'] = Array.prototype.slice.call(res));
+    console.log(obj)
+    return obj
+}
+
+const imageToNormalizedTensor = function (image){
+  
+  return;
+  var tensor = tf.fromPixels(image).toFloat();
+  var offset = tf.scalar(127.5); //(half of 255)
+  tensor = tensor.sub(offset).div(offset);
+  console.log(tensor)
+  tf.fromPixels(image).data().then(res => console.log(res));
+  return tensor;
+}
+
+export {
+  convertToBase64,
+  sendBase64ToServer,
+  imageToNormalizedTensor,
+  sendingPixelBlobToServer,
+  imageToPixelBlob
+};

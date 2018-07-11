@@ -24,7 +24,6 @@ const modelList = {
 };
 
 class Brain {
-
   constructor() {
     this.model;
     this.imageClasses;
@@ -34,58 +33,51 @@ class Brain {
   }
 
   async loadTensor(modelName) {
-  
     let startTime;
     if (DEBUG) {
-      console.log('Loading Model...')
+      console.log("Loading Model...");
       startTime = Date.now();
       console.log(modelName);
     }
-    
-    
-    const imageClassesJson = JSON.parse(
-      fs.readFileSync(
-         __dirname+ modelList[modelName].modelPath
-        , 'utf8'
-      ));
-    
-    this.imageClasses = imageClassesJson
-    if(this.imageClasses){
-      console.log('json loaded...')
+
+    let imageClassesJson = await fs.readFileSync(__dirname + modelList[modelName].imageClasses, "utf8");
+    imageClassesJson = JSON.parse(imageClassesJson);
+
+    this.imageClasses = imageClassesJson;
+    console.log('imageclasses', this.imageClasses[0])
+    if (this.imageClasses) {
+      console.log("json loaded...");
+      
     }
-    const modelPath = 'file://'+__dirname+modelList[modelName].modelPath;
-    console.log( modelPath)
+    const modelPath = "file://" + __dirname + modelList[modelName].modelPath;
+    console.log(modelPath);
     this.model = await tf.loadModel(modelPath);
 
     this.inputShapes = this.model.inputs[0].shape;
-    if (this.inputShapes[0] === null) { this.inputShapes[0] = 1; }
+    if (this.inputShapes[0] === null) {
+      this.inputShapes[0] = 1;
+    }
     this.imageSize = this.inputShapes[1];
 
-
     if (DEBUG) {
-
-      console.log('Loaded in ' + (Date.now() - startTime))
-      console.log('Model Shapes for In/Out')
+      console.log("Loaded in " + (Date.now() - startTime));
+      console.log("Model Shapes for In/Out");
       console.log(this.model.inputs[0].shape);
       console.log(this.model.outputs[0].shape);
-      
     }
-
-
   }
 
-
   async predictFromImage(image) {
-    console.log('predicting');
+    console.log("predicting");
     //image must be sized correctly
     const startTime = Date.now();
 
     // tidy runs the function, then deallocates memory since tf is a hog
     const logits = tf.tidy(() => {
       // build tensor from our image
-      console.log('in the tidy')
+      console.log("in the tidy");
       const img = tf.fromPixels(image).toFloat();
-      console.log('from pixels fired')
+      console.log("from pixels fired");
 
       // change rbg values from [0, 255] to [-1, 1] for inputting into our model
       const offset = tf.scalar(127.5);
@@ -96,7 +88,10 @@ class Brain {
       if (image.width !== this.imageSize || image.height !== this.imageSize) {
         const alignCorners = true;
         resized = tf.image.resizeBilinear(
-          normalized, [this.imageSize, this.imageSize], alignCorners);
+          normalized,
+          [this.imageSize, this.imageSize],
+          alignCorners
+        );
       }
       // Convert our tensor into the shape needed for our model
       const reshaped = resized.reshape(this.inputShapes);
@@ -110,14 +105,55 @@ class Brain {
     const totalTime = Date.now() - startTime;
 
     return predictions;
-
   }
 
-  async buildReadablePredictions(
-    logits,
-    maxPredictions
-  ) {
+  // pixelBlob is an object with the shape of the picture and an array of pixels representing the rbg values (this blob created via)
+  // tf.fromPixels.data() and the shape from tf.fromPixel.shape()
+  // {shape: [150,200,3] array:[255,203...]}
+  async predictFromPixelBlob(pixelBlob) {
+    console.log("predicting");
+    //image must be sized correctly
+    const startTime = Date.now();
+    const arr = pixelBlob.array;
+    const shape = pixelBlob.shape;
+    
+    // tidy runs the function, then deallocates memory since tf is a hog
+    const logits = tf.tidy(() => {
+      const img = tf.tensor3d(arr,shape,'float32');
+      console.log("from pixels fired");
 
+      // change rbg values from [0, 255] to [-1, 1] for inputting into our model
+      const offset = tf.scalar(127.5);
+      const normalized = img.sub(offset).div(offset);
+      //resize if it's not the correct size
+      let resized = normalized;
+      //console.log(normalized);
+      let twidth = normalized.shape[0];
+      let theight = normalized.shape[1];
+      if (twidth !== this.imageSize || theight !== this.imageSize) {
+        const alignCorners = true;
+        console.log(normalized, this.imageSize);
+        resized = tf.image.resizeBilinear(
+          normalized,
+          [this.imageSize, this.imageSize],
+          alignCorners
+        );
+      }
+      // Convert our tensor into the shape needed for our model
+      const reshaped = resized.reshape(this.inputShapes);
+
+      // Make a prediction through our model.
+      return this.model.predict(reshaped);
+    });
+
+    // Convert logits to probabilities and class names.
+    const predictions = await this.buildReadablePredictions(logits, 3);
+    const totalTime = Date.now() - startTime;
+
+    return predictions;
+  }
+
+  async buildReadablePredictions(logits, maxPredictions) {
     const values = await logits.data();
 
     const valuesAndIndices = [];
@@ -145,32 +181,25 @@ class Brain {
     return topClassesAndProbs;
   }
 
-
-
   //given a base64 URL encoded image, return the predictions from mobilenet about what the image contains
   predictFromBase64(base64) {
     const self = this;
-    return new Promise(function (resolve, reject) {
-      const dom = new JSDOM('');
-      console.log('jsdom',JSDOM)
+    return new Promise(function(resolve, reject) {
+      const dom = new JSDOM("");
+      console.log("jsdom", JSDOM);
       //console.log('dom',dom)
       //console.log('window', dom.window)
       //console.log('document', dom.window.document)
-      var image = dom.window.document.createElement('img');
-      console.log('image',image)
-      image.onload = function () {
-        console.log('image loaded')
+      var image = dom.window.document.createElement("img");
+      console.log("image", image);
+      image.onload = function() {
+        console.log("image loaded");
         resolve(self.predictFromImage(image));
-      }
+      };
       image.src = base64;
       resolve(self.predictFromImage(image));
-
     });
   }
-
-
-
-
 }
 
 
