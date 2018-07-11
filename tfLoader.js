@@ -1,16 +1,11 @@
 // load different types of tensorflow models
 const tf = require('@tensorflow/tfjs');
 require("@tensorflow/tfjs-node")
-var jsdom = require("jsdom");
-var { JSDOM } = jsdom;
-
 tf.setBackend("tensorflow");
 const fs = require('fs');
-const http = require('http');
+
 
 const DEBUG = true;
-
-// maybe use fs to load file. create html "file" object out of them, 
 
 const modelList = {
   mobilenet: {
@@ -29,10 +24,9 @@ class Brain {
     this.imageClasses;
     this.imageSize;
     this.inputShapes;
-    this.predictFromImage = this.predictFromImage.bind(this);
   }
 
-  async loadTensor(modelName) {
+  async loadModel(modelName) {
     let startTime;
     if (DEBUG) {
       console.log("Loading Model...");
@@ -47,7 +41,6 @@ class Brain {
     console.log('imageclasses', this.imageClasses[0])
     if (this.imageClasses) {
       console.log("json loaded...");
-      
     }
     const modelPath = "file://" + __dirname + modelList[modelName].modelPath;
     console.log(modelPath);
@@ -64,47 +57,8 @@ class Brain {
       console.log("Model Shapes for In/Out");
       console.log(this.model.inputs[0].shape);
       console.log(this.model.outputs[0].shape);
+      console.log('ready to predict!')
     }
-  }
-
-  async predictFromImage(image) {
-    console.log("predicting");
-    //image must be sized correctly
-    const startTime = Date.now();
-
-    // tidy runs the function, then deallocates memory since tf is a hog
-    const logits = tf.tidy(() => {
-      // build tensor from our image
-      console.log("in the tidy");
-      const img = tf.fromPixels(image).toFloat();
-      console.log("from pixels fired");
-
-      // change rbg values from [0, 255] to [-1, 1] for inputting into our model
-      const offset = tf.scalar(127.5);
-      const normalized = img.sub(offset).div(offset);
-
-      //resize if it's not the correct size
-      let resized = normalized;
-      if (image.width !== this.imageSize || image.height !== this.imageSize) {
-        const alignCorners = true;
-        resized = tf.image.resizeBilinear(
-          normalized,
-          [this.imageSize, this.imageSize],
-          alignCorners
-        );
-      }
-      // Convert our tensor into the shape needed for our model
-      const reshaped = resized.reshape(this.inputShapes);
-
-      // Make a prediction through our model.
-      return this.model.predict(reshaped);
-    });
-
-    // Convert logits to probabilities and class names.
-    const predictions = await this.buildReadablePredictions(logits, 3);
-    const totalTime = Date.now() - startTime;
-
-    return predictions;
   }
 
   // pixelBlob is an object with the shape of the picture and an array of pixels representing the rbg values (this blob created via)
@@ -112,19 +66,20 @@ class Brain {
   // {shape: [150,200,3] array:[255,203...]}
   async predictFromPixelBlob(pixelBlob) {
     console.log("predicting");
-    //image must be sized correctly
+    
     const startTime = Date.now();
     const arr = pixelBlob.array;
     const shape = pixelBlob.shape;
     
     // tidy runs the function, then deallocates memory since tf is a hog
     const logits = tf.tidy(() => {
-      const img = tf.tensor3d(arr,shape,'float32');
-      console.log("from pixels fired");
+
+      //build a 3d tensor from our array and shape
+      const tensor = tf.tensor3d(arr,shape,'float32');
 
       // change rbg values from [0, 255] to [-1, 1] for inputting into our model
       const offset = tf.scalar(127.5);
-      const normalized = img.sub(offset).div(offset);
+      const normalized = tensor.sub(offset).div(offset);
       //resize if it's not the correct size
       let resized = normalized;
       //console.log(normalized);
@@ -132,7 +87,7 @@ class Brain {
       let theight = normalized.shape[1];
       if (twidth !== this.imageSize || theight !== this.imageSize) {
         const alignCorners = true;
-        console.log(normalized, this.imageSize);
+        
         resized = tf.image.resizeBilinear(
           normalized,
           [this.imageSize, this.imageSize],
@@ -181,25 +136,6 @@ class Brain {
     return topClassesAndProbs;
   }
 
-  //given a base64 URL encoded image, return the predictions from mobilenet about what the image contains
-  predictFromBase64(base64) {
-    const self = this;
-    return new Promise(function(resolve, reject) {
-      const dom = new JSDOM("");
-      console.log("jsdom", JSDOM);
-      //console.log('dom',dom)
-      //console.log('window', dom.window)
-      //console.log('document', dom.window.document)
-      var image = dom.window.document.createElement("img");
-      console.log("image", image);
-      image.onload = function() {
-        console.log("image loaded");
-        resolve(self.predictFromImage(image));
-      };
-      image.src = base64;
-      resolve(self.predictFromImage(image));
-    });
-  }
 }
 
 

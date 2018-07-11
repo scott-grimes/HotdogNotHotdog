@@ -48,15 +48,16 @@ app.listen(port, () => {
   console.log('Hotdog Server running on port 3000...');
 
   brain = new Brain();
-  brain.loadTensor('mobilenet').then( ()=>{
-    console.log('Mobilenet loaded and ready');
-  })
-    .catch(err=>console.log(err));
+  brain
+    .loadModel("mobilenet")
+    .then(() => {
+      console.log("Mobilenet loaded and ready");
+    })
+    .catch(err => console.log(err));
 
 });
 
 //app.use(express.static('client/public'));
-
 
 
 // get random urls for images (always returns one hotdog in the list)
@@ -70,43 +71,21 @@ app.get('/random', (req, res) => {
 
 });
 
-
-var predictbase64 = (b64img) => {
-  return brain.predictFromBase64(b64img);
-}
-
-var predictPixelBlob = (pixelBlob) => {
-  return brain.predictFromPixelBlob(pixelBlob);
-}
-
 app.post('/guess', (req, res) => {
   let pchain = null;
   if (!req.body) {
-    pchain = null; //do nothing
-  }else if(req.body.image){
-    pchain = predictbase64(req.body.image);
+    res.status(400).send("Invalid POST request. must be pixelblob");
   } else if (req.body.pixelBlob) {
-    console.log(typeof req.body.pixelBlob.array)
-    console.log(typeof req.body.pixelBlob.shape);
-    pchain = predictPixelBlob(req.body.pixelBlob);
-  }
-  
-
-  if (!pchain){
-    res.status(400).send('Invalid POST request. must be image or tensor');
-    return;
-  }
-
-  pchain.then().then(
+    brain.predictFromPixelBlob(req.body.pixelBlob)
+    .then(
     prediction=>{
-      console.log('prediction on server',prediction)
       res.status(200).send(JSON.stringify(prediction));
     }
   ).catch(err=>{
     console.log(err)
     res.status(400).send(err);
   });
-  
+}
 });
 
 

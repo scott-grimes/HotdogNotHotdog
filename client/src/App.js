@@ -3,9 +3,7 @@ import MainImage from './components/MainImage';
 import Results from './components/Results';
 import Carousel from './components/Carousel';
 import {
-  convertToBase64,
-  sendBase64ToServer,
-  sendingPixelBlobToServer,
+  getPredictionFromServer,
   imageToPixelBlob
 } from "./scripts/api";
 import "./App.css";
@@ -23,19 +21,13 @@ class App extends Component {
     this.fetchRandomImages();
   }
 
+  //given an img element, predict what the image is
   async predict(image) {
-    //const hd64 = await convertToBase64(image.src);
-    const time = Date.now();
-    console.log('Predicting...')
     const pixelBlob = await imageToPixelBlob(image);
-    console.log('in predict app',pixelBlob)
-    const response = await sendingPixelBlobToServer(pixelBlob);
+    const response = await getPredictionFromServer(pixelBlob);
     let predictions = null;
     await response.json().then(res=>predictions=res)
-    //const predictions = await sendBase64ToServer(hd64);
-    const duration = Date.now() - time;
     console.log(predictions)
-    console.log(`Prediction completed in ${Math.floor(duration)}ms`);
     /*
     let hotdogToken = 'Not Hotdog'
     hotdogToken = predictions[0].className.includes('hotdog') ? 'Maybe Hotdog' : hotdogToken;
@@ -48,11 +40,7 @@ class App extends Component {
     }
     console.log(solution)
     return solution*/
-
-    
   }
-
-  
 
   fetchRandomImages() {
 
@@ -72,19 +60,14 @@ class App extends Component {
     if (!this.state.allowSelection) {
       return;
     }
-    //console.log(img);
     this.setState({allowSelection: false, mainImage: img.src});
-    // set state to locked
-
-    // load image
+   
     setTimeout(()=>this.setState({allowSelection: true}), 1000);
-    // fetch thing
-    // on promise resolve, trigger rerender
+    
     this.predict(img);
   }
 
   render() {
-    //console.log(this.state);
     return <div className="App">
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
