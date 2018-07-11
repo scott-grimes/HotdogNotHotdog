@@ -1,6 +1,6 @@
 .Results {
  display:inline-block;
- height: 100px;
+ height: 55px;
  margin: 30px auto 30px;
  text-align: center;
 }
@@ -17,11 +17,4 @@
     display:inline-block;
 
   }
-}
-
-img{
-  max-width:100%;
-  height: auto;
-
-
 }

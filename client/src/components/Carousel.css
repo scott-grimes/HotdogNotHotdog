@@ -5,6 +5,7 @@
 
 .CarouselInner{ 
   max-width: 800px;
+  padding-top: 30px;
   text-align: center;
 }
 
@@ -22,3 +23,27 @@ img{
    display: inline-block;
    margin: 3px;
 }
+
+
+.randomButton {
+
+    border: none;
+    color: #e7e7e7;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+
+    display: inline-block;
+    position: relative;
+    float: center;
+    vertical-align: bottom;
+    background-color: #34373c;
+    border: 2px solid #6b6b6b;
+}
+
+.randomButton:hover {background-color: #3a7a8d;}

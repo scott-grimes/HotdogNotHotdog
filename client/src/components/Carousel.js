@@ -21,13 +21,25 @@ class Carousel extends Component {
         <div className="CarouselInner">
           <div className="ImageList">
             {this.props.randomImages.map((url, index) => {
-              return <img alt={url} key={index} src={url} onClick={this.handleSelect}></img>;
-            })}</div>
-          <p><button onClick={this.props.fetchRandomImages}>Random</button></p></div>
+              return <img alt={url} key={index} src={url} onClick={this.handleSelect} />;
+            })}
+          </div>
+          <p>
+            <div className="randomButton" onClick={this.props.fetchRandomImages}>
+                Random
+            </div>
+          </p>
+        </div>
       </div>;
     }
 
-    return (<div><p><button onClick={this.props.fetchRandomImages}>Random</button></p></div>);
+    return <div>
+      <p>
+        <div className="randomButton" onClick={this.props.fetchRandomImages}>
+            Random
+        </div>
+      </p>
+    </div>;
   }
 }
 
