@@ -3,10 +3,12 @@ import MainImage from './components/MainImage';
 import Results from './components/Results';
 import Carousel from './components/Carousel';
 import {
-  getPredictionFromServer,
+  
   imageToPixelBlob
 } from "./scripts/api";
 import "./App.css";
+
+import Brain from "./tfClient";
 //import logo from './logo.svg';
 
 class App extends Component {
@@ -19,15 +21,25 @@ class App extends Component {
       allowSelection: true, 
       title: 'Processing...',
       predictions:[],
-      lastRandomFetch: 0
+      lastRandomFetch: 0,
+      predictingNow: false
      }; // can be 'none', 'ishotdog', 'notishotdog'
     this.fetchRandomImages = this.fetchRandomImages.bind(this);
     this.selectImage = this.selectImage.bind(this);
     this.predict = this.predict.bind(this);
-    this.fetchRandomImages();
-    this.predict(this.state.mainImage);
     this.uploadHandler = this.uploadHandler.bind(this)
     
+  }
+
+  componentDidMount(){
+    this.fetchRandomImages();
+    this.loadBrain();
+  }
+
+  async loadBrain(){
+    this.brain = new Brain();
+    await this.brain.loadModel("mobilenet");
+    await this.predict(this.state.mainImage);
   }
 
   uploadHandler() {
@@ -49,72 +61,50 @@ class App extends Component {
 
   //given an img element, predict what the image is
   async predict(imgsrc) {
+    if(this.state.predictingNow){
+      return;
+    }
     const self = this;
-    this.setState({predictions: []})
-    this.setState({title:'Processing...'})
+    this.setState({predictions: [],
+      title:'Processing...',
+    'predictingNow':true }
+      )
+
     const img = document.createElement("IMG");
-    var found = false;
     img.onload = async function(){
       try{
         const pixelBlob = await imageToPixelBlob(this);
       
-        setTimeout(() => {
-          if(!found){
-            throw('Server Timeout')
-          }
-        }, 5000);
-        const response = await getPredictionFromServer(pixelBlob);
-        let predictions = null;
+        const response = await self.brain.predictFromPixelBlob(pixelBlob);
         
-        if(response.status===200){
-          found = true
-          await response.json().then(res => predictions = res)
-          
-          self.setState({ predictions: predictions }); 
-          
+        self.setState({ predictions: response }); 
 
-          let verdict = 'NOT HOTDOG';
-          if (predictions.map(x => x.className).includes('hotdog')) {
-          
-            verdict = 'MAYBE HOTDOG';
-          }
-          if (predictions[0].className.includes('hotdog')) {
-
-            verdict = 'IS HOTDOG';
-          }
-
-          self.setState({title:verdict})
-          
-
+        let verdict = 'NOT HOTDOG';
+        if (response.map(x => x.className).includes('hotdog')) {
+        
+          verdict = 'MAYBE HOTDOG';
         }
+        if (response[0].className.includes('hotdog')) {
+
+          verdict = 'IS HOTDOG';
+        }
+
+        self.setState({title:verdict, 'predictingNow':false})
         
       }catch(err){
         console.log(err)
-        
+        self.setState({'predictingNow': false })
       }
       
     }
     img.src = imgsrc;
 
-    
-    /*
-    let hotdogToken = 'Not Hotdog'
-    hotdogToken = predictions[0].className.includes('hotdog') ? 'Maybe Hotdog' : hotdogToken;
-    hotdogToken = predictions[0].probability > 0.9 ? 'Is Hotdog' : hotdogToken;
-    let solution = 'Verdict: ';
-    solution += hotdogToken;
-    solution += '\n\nMachine Thinks this is...\n';
-    for (let predict of predictions) {
-      solution += predict.className + ' : ' + Math.floor(Math.round(predict.probability * 100)) + '%\n'
-    }
-    console.log(solution)
-    return solution*/
   }
 
   fetchRandomImages() {
     const now = Date.now();
     if(now<this.state.lastRandomFetch+2000) return;
-    this.setState({lastRandomFetch: now})
+    this.setState({lastRandomFetch: now});
     return fetch('/random')
       .then(function (response) {
         return response.json();
@@ -128,7 +118,7 @@ class App extends Component {
 
 
   selectImage(imgsrc) {
-    if (!this.state.allowSelection) {
+    if (!this.state.allowSelection || this.state.predictingNow) {
       return;
     }
     this.setState({allowSelection: false, mainImage: imgsrc});
@@ -154,20 +144,28 @@ class App extends Component {
     }
 
     return <div className="App">
-         <header className="App-header">
-        <h1 className="App-title">HotdogNotHotdog</h1>
-        <input onChange={this.uploadHandler} id="file" className="inputfile" type="file" accept="image/*" capture="camera" />
-        <label class="uploadButton" htmlFor="file">
-          Upload &#128228;
-        </label></header>
+        <header className="App-header">
+          <h1 className="App-title">HotdogNotHotdog</h1>
+          
+        </header>
         <div className="ContentWrapper">
-          <h1 className="Title">{this.state.title+' '}<span style={{'color':color}}>{marker}</span></h1>
+          <h1 className="Title">
+            {this.state.title + " "}
+            <span style={{ color: color }}>{marker}</span>
+          <input onChange={this.uploadHandler} id="file" className="inputfile" type="file" accept="image/*" capture="camera" />
+          
+        </h1>
           <MainImage selectImage={this.selectImage} mainImage={this.state.mainImage} />
-        <Results predictions={this.state.predictions} />
-     </div>
-     <div className="ContentWrapper">
-      <Carousel selectImage={this.selectImage} fetchRandomImages={this.fetchRandomImages} randomImages={this.state.randomImages} />
-      </div>
+          <Results predictions={this.state.predictions} />
+        </div>
+        <div className="ContentWrapper">
+        <label className="uploadButton" htmlFor="file">
+          <span role="img" aria-label="upload">
+            Upload &#128228;
+            </span>
+        </label>
+          <Carousel selectImage={this.selectImage} fetchRandomImages={this.fetchRandomImages} randomImages={this.state.randomImages} />
+        </div>
       </div>;
   }
 }

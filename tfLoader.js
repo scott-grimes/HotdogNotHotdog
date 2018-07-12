@@ -1,7 +1,8 @@
 // load different types of tensorflow models
 const tf = require('@tensorflow/tfjs');
-require("@tensorflow/tfjs-node")
-tf.setBackend("tensorflow");
+// HERO does not support tf backend! emergency rework for client-side
+//require("@tensorflow/tfjs-node")
+//tf.setBackend("tensorflow");
 const fs = require('fs');
 
 
@@ -145,7 +146,7 @@ class Brain {
 
 
 
-module.exports = { Brain };
+//module.exports = { Brain };
 
 
 // view pretrained at https://github.com/tensorflow/models/tree/master/research/slim#Pretrained

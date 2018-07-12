@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
-const Brain = require('./tfLoader').Brain;
+// heroku does not support tf backend. rework for client-side
+//const Brain = require('./tfLoader').Brain;
 
 const bodyParser = require("body-parser");
 
@@ -53,13 +54,13 @@ fs.readdir(
 app.listen(port, () => {
   console.log('Hotdog Server running on port 3000...');
 
-  brain = new Brain();
-  brain
-    .loadModel("mobilenet")
-    .then(() => {
-      console.log("Mobilenet loaded and ready");
-    })
-    .catch(err => console.log(err));
+  // brain = new Brain();
+  // brain
+  //   .loadModel("mobilenet")
+  //   .then(() => {
+  //     console.log("Mobilenet loaded and ready");
+  //   })
+  //   .catch(err => console.log(err));
 
 });
 
@@ -77,22 +78,23 @@ app.get('/random', (req, res) => {
 
 });
 
-app.post('/guess', (req, res) => {
-  let pchain = null;
-  if (!req.body) {
-    res.status(400).send("Invalid POST request. must be pixelblob");
-  } else if (req.body.pixelBlob) {
-    brain.predictFromPixelBlob(req.body.pixelBlob)
-    .then(
-    prediction=>{
-      res.status(200).send(JSON.stringify(prediction));
-    }
-  ).catch(err=>{
-    console.log(err)
-    res.status(400).send(err);
-  });
-}
-});
+// app.post('/guess', (req, res) => {
+  
+//   let pchain = null;
+//   if (!req.body) {
+//     res.status(400).send("Invalid POST request. must be pixelblob");
+//   } else if (req.body.pixelBlob) {
+//     brain.predictFromPixelBlob(req.body.pixelBlob)
+//     .then(
+//     prediction=>{
+//       res.status(200).send(JSON.stringify(prediction));
+//     }
+//   ).catch(err=>{
+//     console.log(err)
+//     res.status(400).send(err);
+//   });
+// }
+// });
 
 
 

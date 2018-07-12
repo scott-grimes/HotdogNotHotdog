@@ -24,21 +24,21 @@ class Carousel extends Component {
               return <img alt={url} key={index} src={url} onClick={this.handleSelect} />;
             })}
           </div>
-          <p>
-            <div className="randomButton" onClick={this.props.fetchRandomImages}>
+          
+          <div className="randomButton" onClick={this.props.fetchRandomImages}>
                 Random
-            </div>
-          </p>
+          </div>
+          
         </div>
       </div>;
     }
 
     return <div>
-      <p>
-        <div className="randomButton" onClick={this.props.fetchRandomImages}>
+      
+      <div className="randomButton" onClick={this.props.fetchRandomImages}>
             Random
-        </div>
-      </p>
+      </div>
+      
     </div>;
   }
 }
