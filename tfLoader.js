@@ -38,7 +38,7 @@ class Brain {
     imageClassesJson = JSON.parse(imageClassesJson);
 
     this.imageClasses = imageClassesJson;
-    console.log('imageclasses', this.imageClasses[0])
+    //console.log('imageclasses', this.imageClasses[0])
     if (this.imageClasses) {
       console.log("json loaded...");
     }
@@ -65,7 +65,7 @@ class Brain {
   // tf.fromPixels.data() and the shape from tf.fromPixel.shape()
   // {shape: [150,200,3] array:[255,203...]}
   async predictFromPixelBlob(pixelBlob) {
-    console.log("predicting");
+    //console.log("predicting");
     
     const startTime = Date.now();
     const arr = pixelBlob.array;

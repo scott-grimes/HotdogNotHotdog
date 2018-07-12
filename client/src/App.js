@@ -57,7 +57,7 @@ class App extends Component {
     img.onload = async function(){
       try{
         const pixelBlob = await imageToPixelBlob(this);
-        console.log(pixelBlob)
+      
         setTimeout(() => {
           if(!found){
             throw('Server Timeout')
@@ -90,7 +90,7 @@ class App extends Component {
         
       }catch(err){
         console.log(err)
-        alert(err);
+        
       }
       
     }
